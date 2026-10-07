@@ -1,44 +1,44 @@
-# Quiz App — Android Developer Technical Test
+# Quiz App — Technical Test Android Developer
 
-Native Android Quiz App built using **Kotlin + Jetpack Compose** for the Android Developer Technical Test.
+Aplikasi Quiz Android Native yang dibuat menggunakan **Kotlin + Jetpack Compose** untuk memenuhi Technical Test Android Developer.
 
-## Features
+## Fitur
 
-- Home → Select Difficulty → Quiz → Result
-- Easy, Medium, and Hard difficulty
-- 10 dynamically generated questions per quiz
-- 4 unique answer options with exactly 1 correct answer
-- Current question progress and live score
-- Replay quiz
-- Best score persisted locally for each difficulty
-- Unit tests for important question-generation rules
+- Alur aplikasi: Home → Pilih Tingkat Kesulitan → Quiz → Hasil
+- Tersedia tingkat kesulitan Easy, Medium, dan Hard
+- Setiap quiz terdiri dari 10 pertanyaan yang dibuat secara dinamis
+- Setiap pertanyaan memiliki 4 pilihan jawaban unik dengan tepat 1 jawaban benar
+- Menampilkan progress pertanyaan dan score saat quiz berlangsung
+- User dapat memainkan quiz kembali setelah selesai
+- Best score disimpan secara lokal untuk setiap tingkat kesulitan
+- Unit test untuk logic utama question generator
 
 ## Tech Stack
 
 - Kotlin
 - Native Android
 - Jetpack Compose + Material 3
-- MVVM-style state management with `ViewModel` + `StateFlow`
+- State management bergaya MVVM menggunakan `ViewModel` + `StateFlow`
 - Navigation Compose
 - DataStore Preferences
 - JUnit 4
 
-## How to Run
+## Cara Menjalankan Project
 
-1. Clone this repository.
-2. Open it in Android Studio.
-3. Use **JDK 17**.
-4. Allow Gradle Sync to complete.
-5. Run the `app` configuration on an emulator or physical Android device.
+1. Clone repository ini.
+2. Buka project menggunakan Android Studio.
+3. Gunakan **JDK 17**.
+4. Tunggu hingga Gradle Sync selesai.
+5. Jalankan konfigurasi `app` menggunakan emulator atau perangkat Android fisik.
 
-Project configuration:
+Konfigurasi project:
 - Minimum SDK: 24
 - Target SDK: 35
 - Compile SDK: 35
 
-> If the repository does not contain Gradle Wrapper binaries, Android Studio can sync using its configured Gradle installation or you can generate the wrapper locally with `gradle wrapper`.
+> Jika Gradle Wrapper belum tersedia di repository, project dapat disinkronkan menggunakan konfigurasi Gradle yang tersedia di Android Studio atau Gradle Wrapper dapat dibuat secara lokal menggunakan perintah `gradle wrapper`.
 
-## Project Structure
+## Struktur Project
 
 ```text
 app/src/main/java/com/arwin/quizapp/
@@ -59,132 +59,142 @@ app/src/main/java/com/arwin/quizapp/
 └── QuizViewModel.kt
 ```
 
-The project intentionally uses a lightweight MVVM-style structure. A larger clean-architecture/module split was avoided because this is a small technical test and would add unnecessary complexity.
+Project ini menggunakan struktur MVVM sederhana. Pemisahan menjadi banyak module atau clean architecture penuh sengaja tidak digunakan karena scope aplikasi relatif kecil dan hal tersebut dapat menambah kompleksitas yang tidak diperlukan.
 
-## Quiz Flow
+## Alur Quiz
 
 ```text
 Home
   ↓
-Select Difficulty
+Pilih Tingkat Kesulitan
   ↓
-Quiz (10 questions)
+Quiz (10 pertanyaan)
   ↓
-Result
-  ├── Play Again
-  └── Back to Home
+Hasil
+  ├── Main Lagi
+  └── Kembali ke Home
 ```
 
 ## Question Generator
 
-Questions are generated at runtime rather than loaded from a static question bank.
+Pertanyaan dibuat secara dinamis saat aplikasi dijalankan, bukan diambil dari bank soal statis.
 
-Each `Question` contains:
-- question text
-- 4 unique integer options
-- exactly 1 correct answer
+Setiap object `Question` memiliki:
+- teks pertanyaan
+- 4 pilihan jawaban berupa integer yang unik
+- tepat 1 jawaban yang benar
 
-Wrong answers are generated around the correct result, deduplicated, and shuffled with the correct answer.
+Pilihan jawaban yang salah dibuat berdasarkan nilai di sekitar jawaban benar, kemudian dilakukan deduplikasi dan pengacakan bersama jawaban yang benar.
 
-### Difficulty
+### Perbedaan Tingkat Kesulitan
 
 **Easy**
-- Addition and subtraction
-- Numbers mainly between 1 and 20
+- Penjumlahan dan pengurangan
+- Angka yang digunakan sebagian besar berada pada rentang 1 sampai 20
 
-Example:
+Contoh:
 ```text
 12 + 7 = ?
 ```
 
 **Medium**
-- Multiplication
-- Exact division
-- Operands mainly between 2 and 12
+- Perkalian
+- Pembagian dengan hasil bilangan bulat
+- Operand sebagian besar berada pada rentang 2 sampai 12
 
-Example:
+Contoh:
 ```text
 8 × 7 = ?
 ```
 
 **Hard**
-- Mixed operators
-- Requires simple operator precedence
+- Menggunakan kombinasi beberapa operator
+- Membutuhkan pemahaman sederhana mengenai prioritas operator
 
-Example:
+Contoh:
 ```text
 16 + 4 × 6 = ?
 ```
 
-The difference between difficulties is therefore implemented directly in the generation algorithm rather than only through labels.
+Dengan pendekatan ini, perbedaan antara Easy, Medium, dan Hard diterapkan langsung pada algoritma pembentukan pertanyaan, bukan hanya pada label tingkat kesulitan.
 
 ## State Management
 
-`QuizViewModel` owns the current `QuizState`, including:
-- selected difficulty
-- generated questions
-- current question index
+`QuizViewModel` menyimpan dan mengelola `QuizState`, yang mencakup:
+
+- tingkat kesulitan yang dipilih
+- daftar pertanyaan yang dihasilkan
+- index pertanyaan saat ini
 - score
 - best score
-- completion status
+- status apakah quiz sudah selesai
 
-The UI observes a `StateFlow<QuizState>` and renders itself from that state.
+UI melakukan observasi terhadap `StateFlow<QuizState>` dan menampilkan tampilan berdasarkan state tersebut.
 
 ## Local Persistence
 
-`BestScoreRepository` uses **AndroidX DataStore Preferences**.
+`BestScoreRepository` menggunakan **AndroidX DataStore Preferences** untuk menyimpan best score secara lokal.
 
-A separate best score is stored for:
+Best score disimpan secara terpisah untuk:
 - Easy
 - Medium
 - Hard
 
-DataStore was chosen instead of Room because only a few scalar preference values need to be persisted.
+DataStore dipilih dibandingkan Room karena data yang perlu disimpan hanya berupa beberapa nilai sederhana dan tidak membutuhkan relational database.
 
 ## Testing
 
-`QuestionGeneratorTest` verifies business rules that are important for the quiz:
+`QuestionGeneratorTest` digunakan untuk menguji business logic yang penting pada aplikasi.
 
-- generated quiz contains exactly 10 questions
-- every question has exactly 4 unique choices
-- the correct answer is present exactly once
-- Hard questions contain mixed operations
+Test yang tersedia memastikan bahwa:
 
-The goal is not maximum coverage, but testing the logic where bugs would affect core quiz behavior.
+- setiap quiz menghasilkan tepat 10 pertanyaan
+- setiap pertanyaan memiliki tepat 4 pilihan jawaban yang unik
+- jawaban benar terdapat tepat satu kali pada pilihan jawaban
+- pertanyaan Hard menggunakan kombinasi beberapa operasi
 
-Run unit tests with Android Studio or:
+Fokus testing bukan untuk mendapatkan coverage setinggi mungkin, tetapi untuk memastikan logic inti dari quiz berjalan sesuai requirement.
+
+Unit test dapat dijalankan melalui Android Studio atau menggunakan:
 
 ```bash
 ./gradlew test
 ```
 
-when Gradle Wrapper is available.
+jika Gradle Wrapper sudah tersedia.
 
-## Technical Decisions
+## Keputusan Teknis
 
 ### Jetpack Compose
-Compose fits the application's state-driven and relatively small UI and avoids unnecessary XML boilerplate.
 
-### No dependency-injection framework
-For a project of this size, Hilt/Koin would add setup and abstraction with little practical benefit. Dependencies are passed through a small `ViewModelProvider.Factory`.
+Jetpack Compose dipilih karena sesuai untuk UI yang sederhana dan berbasis state. Compose juga mengurangi kebutuhan terhadap XML layout dan membuat implementasi UI lebih ringkas.
 
-### Runtime question generation
-This makes the app fully offline and demonstrates business logic without requiring an API or database.
+### Tidak Menggunakan Dependency Injection Framework
 
-### DataStore instead of Room
-Only the best-score values need persistence, so a relational database would be unnecessary.
+Framework seperti Hilt atau Koin tidak digunakan karena scope project relatif kecil. Menambahkan dependency injection framework akan menambah setup dan abstraction yang belum diperlukan.
 
-## Trade-offs / Possible Improvements
+Dependency yang dibutuhkan diberikan melalui `ViewModelProvider.Factory` sederhana.
 
-With more time I would consider:
-- visual correct/wrong feedback before advancing
-- timer-based quiz mode
-- question categories
-- richer score history
-- UI/instrumentation tests
-- localization
-- accessibility review
-- saved-state restoration for an interrupted quiz
+### Pertanyaan Dibuat Secara Dinamis
+
+Question generator dibuat secara lokal sehingga aplikasi dapat berjalan sepenuhnya secara offline dan sekaligus menunjukkan implementasi business logic tanpa membutuhkan API atau database soal.
+
+### DataStore Dibandingkan Room
+
+Karena data persistence hanya berupa best score, DataStore lebih sederhana dan sesuai dibandingkan menggunakan Room.
+
+## Trade-off dan Pengembangan Selanjutnya
+
+Jika memiliki waktu pengembangan lebih banyak, beberapa improvement yang dapat dilakukan antara lain:
+
+- menampilkan feedback visual untuk jawaban benar atau salah sebelum berpindah ke pertanyaan berikutnya
+- menambahkan mode quiz dengan timer
+- menambahkan kategori pertanyaan
+- menyimpan riwayat score yang lebih lengkap
+- menambahkan UI test dan instrumentation test
+- mendukung localization
+- meningkatkan accessibility
+- menyimpan state quiz apabila aplikasi tertutup ketika quiz sedang berlangsung
 
 ## Author
 
